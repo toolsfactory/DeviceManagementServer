@@ -12,6 +12,7 @@ using Amazon.Runtime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using DeviceManagementServer.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace DeviceManagementServer.Controllers
 {
@@ -21,10 +22,12 @@ namespace DeviceManagementServer.Controllers
     {
         private readonly ICommandManagementService _commandManagementService;
         private readonly ICommandExecutionService _commandExecutionService;
+        private readonly IConfiguration _config;
 
-        public DevicesController(ICommandManagementService commandManagementService, ICommandExecutionService commandExecutionService) {
+        public DevicesController(ICommandManagementService commandManagementService, ICommandExecutionService commandExecutionService, IConfiguration configuration) {
             this._commandManagementService = commandManagementService;
             this._commandExecutionService = commandExecutionService;
+            this._config = configuration;
         }
 
         // GET: /Devices
@@ -39,7 +42,7 @@ namespace DeviceManagementServer.Controllers
         public async Task<ActionResult<Models.DeviceModel>> GetAsync(string id)
         {
             var model = new Models.DeviceModel();
-            var awsCredentials = new BasicAWSCredentials("AKIA2JRMYBRZYBN4NUWA", "d2MZoYRtiXly/pXaZ2B1PBh+YUfA4fXfXOk355S2");
+            var awsCredentials = new BasicAWSCredentials(_config["AWS:ApiAccessKey"], _config["AWS:ApiSecretKey"]);
             var client = new AmazonIoTClient(awsCredentials, RegionEndpoint.EUCentral1);
             var response = await client.ListJobsAsync(new Amazon.IoT.Model.ListJobsRequest() { ThingGroupName = "stb-456def" });
             return Ok();
