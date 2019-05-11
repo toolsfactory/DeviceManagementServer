@@ -3,12 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeviceManagementServer", "DeviceManagementServer\DeviceManagementServer.csproj", "{B794AD08-41AE-4ACD-A997-F2D0C4048C60}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E2325B48-FA1E-4BF7-A19F-EF6EBFAD7C8E}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VTV.OpsConsole.RemoteManagement.APIServer", "VTV.OpsConsole.RemoteManagement.APIServer\VTV.OpsConsole.RemoteManagement.APIServer.csproj", "{9B5D1EA7-880B-415B-AD03-1A89C8BEA909}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VTV.OpsConsole.RemoteManagement.Services", "VTV.OpsConsole.RemoteManagement.Services\VTV.OpsConsole.RemoteManagement.Services.csproj", "{AB7D4752-F74A-4C83-B339-A6B238169DA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VTV.OpsConsole.RemoteManagement.Interfaces", "VTV.OpsConsole.RemoteManagement.Interfaces\VTV.OpsConsole.RemoteManagement.Interfaces.csproj", "{7E88CAF0-C836-4C5B-AA2B-28A2D58B0319}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,10 +20,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B794AD08-41AE-4ACD-A997-F2D0C4048C60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B794AD08-41AE-4ACD-A997-F2D0C4048C60}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B794AD08-41AE-4ACD-A997-F2D0C4048C60}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B794AD08-41AE-4ACD-A997-F2D0C4048C60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B5D1EA7-880B-415B-AD03-1A89C8BEA909}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B5D1EA7-880B-415B-AD03-1A89C8BEA909}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B5D1EA7-880B-415B-AD03-1A89C8BEA909}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B5D1EA7-880B-415B-AD03-1A89C8BEA909}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB7D4752-F74A-4C83-B339-A6B238169DA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB7D4752-F74A-4C83-B339-A6B238169DA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB7D4752-F74A-4C83-B339-A6B238169DA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB7D4752-F74A-4C83-B339-A6B238169DA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E88CAF0-C836-4C5B-AA2B-28A2D58B0319}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E88CAF0-C836-4C5B-AA2B-28A2D58B0319}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E88CAF0-C836-4C5B-AA2B-28A2D58B0319}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E88CAF0-C836-4C5B-AA2B-28A2D58B0319}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

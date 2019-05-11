@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.IoT" Version="3.3.100.17" />
+    <PackageReference Include="AWSSDK.IotData" Version="3.3.100.17" />
+    <PackageReference Include="AWSSDK.IoTJobsDataPlane" Version="3.3.100.17" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+</Project>

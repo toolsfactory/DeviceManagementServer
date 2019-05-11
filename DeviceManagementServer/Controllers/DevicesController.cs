@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using DeviceManagementServer.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DeviceManagementServer.Controllers
 {
@@ -32,9 +33,9 @@ namespace DeviceManagementServer.Controllers
 
         // GET: /Devices
         [HttpGet]
-        public string Get()
+        public object Get()
         {
-            return "No Device List";
+            return User.Claims;
         }
 
         // GET: /Devices/5
@@ -44,8 +45,10 @@ namespace DeviceManagementServer.Controllers
             var model = new Models.DeviceModel();
             var awsCredentials = new BasicAWSCredentials(_config["AWS:ApiAccessKey"], _config["AWS:ApiSecretKey"]);
             var client = new AmazonIoTClient(awsCredentials, RegionEndpoint.EUCentral1);
-            var response = await client.ListJobsAsync(new Amazon.IoT.Model.ListJobsRequest() { ThingGroupName = "stb-456def" });
-            return Ok();
+            var dataclient = new AmazonIotDataClient("https://" + _config["AWS:IoTEndpoint"], awsCredentials);
+            var response = await client.ListJobsAsync(new Amazon.IoT.Model.ListJobsRequest() { ThingGroupName = id });
+            var second = await dataclient.GetThingShadowAsync(new Amazon.IotData.Model.GetThingShadowRequest() { ThingName = id });
+            return Ok(new Models.DeviceModel() { Id = id, Manufacturer = "sample", DeviceShadow = JObject.Parse(GetStringFromStream(second.Payload)) });
         }
 
         // GET: /Devices/5/jobs

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace DeviceManagementServer
+namespace VTV.OpsConsole.RemoteManagement.APIServer
 {
     public class Program
     {
@@ -19,11 +19,11 @@ namespace DeviceManagementServer
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                /*
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     if (!hostingContext.HostingEnvironment.IsDevelopment())
                     {
-                        // Don't add AWS secrets in local environment
                         config.AddSecretsManager(configurator: ops =>
                         {
                             // Replace __ tokens in the configuration key name
@@ -31,6 +31,7 @@ namespace DeviceManagementServer
                         });
                     }
                 })
+                */
                 .UseStartup<Startup>();
     }
 }

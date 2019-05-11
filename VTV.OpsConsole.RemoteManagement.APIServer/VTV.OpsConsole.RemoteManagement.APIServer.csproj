@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <UserSecretsId>468f6b69-f54b-42eb-a33b-b0931df6baba</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.IoT" Version="3.3.100.17" />
+    <PackageReference Include="AWSSDK.IotData" Version="3.3.100.17" />
+    <PackageReference Include="AWSSDK.IoTJobsDataPlane" Version="3.3.100.17" />
+    <PackageReference Include="AWSSDK.SecretsManager" Version="3.3.100.17" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VTV.OpsConsole.RemoteManagement.Interfaces\VTV.OpsConsole.RemoteManagement.Interfaces.csproj" />
+    <ProjectReference Include="..\VTV.OpsConsole.RemoteManagement.Services\VTV.OpsConsole.RemoteManagement.Services.csproj" />
+  </ItemGroup>
+
+</Project>

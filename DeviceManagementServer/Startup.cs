@@ -1,17 +1,11 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using DeviceManagementServer.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace DeviceManagementServer
 {
@@ -28,6 +22,31 @@ namespace DeviceManagementServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            /*
+            services.AddAuthentication("Bearer")
+            .AddJwtBearer(options =>
+            {
+                options.Audience = Configuration["AWS:UserPoolClientId"];
+                options.Authority = Configuration["Authentication:Cognito:BaseAddress"];
+            });
+            
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            })
+                .AddCookie()
+                .AddOpenIdConnect(options =>
+                {
+                    options.ResponseType = "code";
+                    options.MetadataAddress = Configuration["Authentication:Cognito:MetadataAddress"];
+                    options.ClientId = Configuration["AWS:UserPoolClientId"];
+                    options.ClientSecret = Configuration["AWS:UserPoolClientSecret"];
+                });
+            //*/
+            //            services.AddCognitoIdentity();
+
             services.AddSingleton<IAWSClientsService, AWSClientsService>();
             services.AddSingleton<ICommandExecutionService, CommandExecutionService>();
             services.AddSingleton<ICommandManagementService, CommandManagementService>();
@@ -45,9 +64,9 @@ namespace DeviceManagementServer
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-                app.UseHttpsRedirection();
             }
-
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseMvc();
         }
     }

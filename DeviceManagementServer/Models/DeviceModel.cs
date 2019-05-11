@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,5 +16,6 @@ namespace DeviceManagementServer.Models
         public Dictionary<string, string> Versions { get; set; }
         public Dictionary<string, string> AdditionalAttributes { get; set; }
         public List<string> Tags { get; set; }
+        public JObject DeviceShadow { get; set; }
     }
 }
