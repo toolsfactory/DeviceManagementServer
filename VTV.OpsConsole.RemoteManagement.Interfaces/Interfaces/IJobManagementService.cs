@@ -7,6 +7,7 @@ namespace VTV.OpsConsole.RemoteManagement.Interfaces
     public interface IJobManagementService
     {
         Task<JobDetailsResult> GetJobDetailsAsync(string jobId);
+        Task DeleteJobAsync(string jobId);
     }
 
     public class JobDetailsResult

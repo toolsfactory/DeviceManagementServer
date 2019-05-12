@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Amazon.IoT;
 using Amazon.IoT.Model;
@@ -17,11 +18,24 @@ namespace VTV.OpsConsole.RemoteManagement.Services
             this.config = config;
         }
 
+        public async Task DeleteJobAsync(string jobId)
+        {
+            var request = new DeleteJobRequest { JobId = jobId };
+            try
+            {
+                var response = await awsClientsService.IoTClient.DeleteJobAsync(request);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         public async Task<JobDetailsResult> GetJobDetailsAsync(string jobId)
         {
             DescribeJobResponse awsresponse;
             JobDetailsResult result = new JobDetailsResult();
-            var request = new DescribeJobRequest() { JobId = jobId };
+            var request = new DescribeJobRequest { JobId = jobId };
             try
             {
                 awsresponse = await awsClientsService.IoTClient.DescribeJobAsync(request);

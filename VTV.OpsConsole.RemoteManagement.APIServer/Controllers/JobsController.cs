@@ -16,11 +16,29 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         }
 
         // GET: /Jobs/5
-        [HttpGet("{id}", Name = "GetJobs")]
-        public async Task<ActionResult<JobDetailsResult>> GetAsync(string id)
+        /// <summary>
+        /// Status of the job
+        /// </summary>
+        /// <param name="id">Uniqued id of the job</param>
+        /// <returns>Status details</returns>
+        [HttpGet("{id}", Name = "GetJob")]
+        public async Task<ActionResult<JobDetailsResult>> GetJobAsync(string id)
         {
             var result = await _jobManagementService.GetJobDetailsAsync(id);
             return result;
+        }
+
+        // DELETE: /Jobs/5
+        /// <summary>
+        /// Delete a specific job
+        /// </summary>
+        /// <param name="id">Unique id of the job</param>
+        /// <returns>Code</returns>
+        [HttpDelete("{id}", Name = "DeleteJob")]
+        public async Task<ActionResult> DeleteJobAsync(string id)
+        {
+            await _jobManagementService.DeleteJobAsync(id);
+            return Ok();
         }
 
     }

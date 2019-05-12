@@ -25,7 +25,7 @@ namespace VTV.OpsConsole.RemoteManagement.Services
                 var result = new DevicesListModel();
                 foreach (var item in data.Things)
                 {
-                    result.Devices.Add(new DevicesListEntryModel() { DeviceId = item, DeviceName = item, DeviceUrl = config["BaseSystem:ServerUrl"] + "/"+item });
+                    result.Devices.Add(new DevicesListEntryModel() { DeviceId = item, DeviceName = item, DeviceUrl = config["BaseSystem:ServerUrl"] + "/api/devices/"+item });
                 }
                 return result;
             }
