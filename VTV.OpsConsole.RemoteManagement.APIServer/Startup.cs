@@ -47,7 +47,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer
 
             services.AddSingleton<IAWSClientsService, AWSClientsService>();
             services.AddSingleton<IDevicesService, DevicesService>();
-            services.AddSingleton<IDeviceService, DeviceService>();
+            services.AddSingleton<IDeviceDetailsService, DeviceDetailsService>();
             services.AddSingleton<ICommandSendService, CommandSendService>();
             services.AddSingleton<ICommandsManagementService, CommandManagementService>();
             services.AddSingleton<IJobManagementService, JobManagementService>();

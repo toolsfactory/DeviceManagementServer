@@ -1,6 +1,6 @@
 ﻿namespace VTV.OpsConsole.RemoteManagement.Models
 {
-    public class CommandSendResult
+    public class JobSendResult
     {
         public System.Net.HttpStatusCode StatusCode { get; set; }
         public string ErrorDescription { get; set; }

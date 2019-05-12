@@ -9,5 +9,6 @@ namespace VTV.OpsConsole.RemoteManagement.Interfaces
         void LoadCommandTemplates();
         bool CommandExists(string command);
         CommandParsingResult TryParseCommandAndParameters(string command, string body = "");
+        CommandTemplate GetCommandTemplate(string cmd);
     }
 }

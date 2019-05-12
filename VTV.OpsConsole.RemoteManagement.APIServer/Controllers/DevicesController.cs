@@ -15,11 +15,11 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
     public class DevicesController : ControllerBase
     {
         private readonly IDevicesService devicesService;
-        private readonly IDeviceService deviceService;
+        private readonly IDeviceDetailsService deviceService;
         private readonly ICommandSendService commandSendService;
         private readonly ICommandsManagementService commandManagementService;
 
-        public DevicesController(IDevicesService devicesService, IDeviceService deviceService, ICommandSendService commandSendService, ICommandsManagementService commandManagementService)
+        public DevicesController(IDevicesService devicesService, IDeviceDetailsService deviceService, ICommandSendService commandSendService, ICommandsManagementService commandManagementService)
         {
             this.devicesService = devicesService;
             this.deviceService = deviceService;
@@ -29,7 +29,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 
         // GET api/devices
         /// <summary>
-        /// Returns a list of all devices registered in the ThingGroup "STB_GC_MOCK"
+        /// Returns a list of all devices registered in the ThingGroup for this mock
         /// </summary>
         /// <returns>List of devices</returns>
         [HttpGet]
@@ -65,14 +65,14 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 
         // GET api/devices/stb-123abc/commands
         /// <summary>
-        /// List of commands supported by that device. NOT IMPLEMENTED!
+        /// List of commands currently in the queue
         /// </summary>
         /// <param name="id">Unique Id of the device</param>
-        /// <returns>EMPTY</returns>
+        /// <returns>queued commands</returns>
         [HttpGet("{id}/commands")]
-        public ActionResult GetDeviceCommandsAsync(string id)
+        public async Task<ActionResult<IReadOnlyList<DeviceJobsModel>>> GetDeviceCommands(string id)
         {
-            return Ok("listing commands supported by a device is not supported in the demo");
+            return Ok(await deviceService.GetJobsForDeviceAsync(id));
         }
 
         // POST api/devices/stb-123abc/commands/reboot
@@ -86,7 +86,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         /// <returns>job details</returns>
         /// <remarks>Remark: if no parameters are available or set, request body must at least be "{}".</remarks>
         [HttpPost("{id}/commands/{command}")]
-        public async Task<ActionResult<CommandSendResult>> PostCommandAsync(string id, string command, [FromBody] JObject parameters)
+        public async Task<ActionResult<JobSendResult>> PostCommandAsync(string id, string command, [FromBody] JObject parameters)
         {
             if (!commandManagementService.CommandExists(command))
                 return NotFound();
@@ -97,6 +97,26 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
             if (result.StatusCode != System.Net.HttpStatusCode.OK)
                 return StatusCode((int)result.StatusCode, result.ErrorDescription);
             
+            return result;
+        }
+
+        // POST api/devices/stb-123abc/customjob
+        /// <summary>
+        /// Sends a custom job to the device
+        /// </summary>
+        /// <param name="id">Unique Id of the device</param>
+        /// <param name="parameters">optional parameters send in the body of the request.</param>
+        /// 
+        /// <returns>job details</returns>
+        /// <remarks>Remark: if no parameters are available or set, request body must at least be "{}".</remarks>
+        [HttpPost("{id}/customjob")]
+        public async Task<ActionResult<JobSendResult>> PostCustomJobAsync(string id, [FromBody] JObject parameters)
+        {
+            var result = await commandSendService.SendCustomJobToDeviceAsync(id, parameters);
+
+            if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                return StatusCode((int)result.StatusCode, result.ErrorDescription);
+
             return result;
         }
     }

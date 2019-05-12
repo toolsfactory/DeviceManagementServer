@@ -6,6 +6,7 @@ namespace VTV.OpsConsole.RemoteManagement.Interfaces
 {
     public interface ICommandSendService
     {
-        Task<CommandSendResult> SendCommandToDeviceAsync(string deviceid, Command command, JObject parameters = null);
+        Task<JobSendResult> SendCommandToDeviceAsync(string deviceid, Command command, JObject parameters = null);
+        Task<JobSendResult> SendCustomJobToDeviceAsync(string deviceId, JObject data);
     }
 }

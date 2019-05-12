@@ -21,11 +21,16 @@ namespace VTV.OpsConsole.RemoteManagement.Services
         {
             try
             {
-                var data = await awsClientsService.IoTClient.ListThingsInThingGroupAsync(new Amazon.IoT.Model.ListThingsInThingGroupRequest() { MaxResults = 25, ThingGroupName = "STB_GC_MOCK" });
+                var data = await awsClientsService.IoTClient.ListThingsInThingGroupAsync(new Amazon.IoT.Model.ListThingsInThingGroupRequest() { MaxResults = 100, ThingGroupName = config["BaseSystem:ThingGroup"] });
                 var result = new DevicesListModel();
                 foreach (var item in data.Things)
                 {
-                    result.Devices.Add(new DevicesListEntryModel() { DeviceId = item, DeviceName = item, DeviceUrl = config["BaseSystem:ServerUrl"] + "/api/devices/"+item });
+                    result.Devices.Add(new DevicesListEntryModel()
+                    {
+                        DeviceId = item,
+                        DeviceName = item,
+                        DeviceUrl = config["BaseSystem:ServerUrl"] + "/api/devices/"+item
+                    });
                 }
                 return result;
             }

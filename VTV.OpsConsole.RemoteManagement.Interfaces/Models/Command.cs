@@ -5,7 +5,8 @@ namespace VTV.OpsConsole.RemoteManagement.Models
     public enum CommandParameterType
     {
         String,
-        Integer
+        Integer,
+        boolean
     }
 
     public class CommandParameter

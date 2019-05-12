@@ -21,19 +21,31 @@ namespace VTV.OpsConsole.RemoteManagement.Services
             this.config = config;
         }
 
-        public async Task<CommandSendResult> SendCommandToDeviceAsync(string deviceId, Command command, JObject parameters = null)
+        public async Task<JobSendResult> SendCommandToDeviceAsync(string deviceId, Command command, JObject parameters = null)
         {
-            CreateJobResponse clientresponse;
-            CommandSendResult response = new CommandSendResult();
+            var response = await SendJobAsync(deviceId, this.config["BaseSystem:CommandPrefix"], CreateJobDocument(command));
+            return response;
+        }
+
+        public async Task<JobSendResult> SendCustomJobToDeviceAsync(string deviceId, JObject data)
+        {
+            data.Add("operation", "RemoteManagement");
+            var response = await SendJobAsync(deviceId, this.config["BaseSystem:CustomJobPrefix"], data.ToString());
+            return response;
+        }
+
+        private async Task<JobSendResult> SendJobAsync(string deviceId, string prefix, string document)
+        {
+            JobSendResult response = new JobSendResult();
             var request = new Amazon.IoT.Model.CreateJobRequest()
             {
-                Document = CreateJobDocument(command),
-                JobId = this.config["BaseSystem:CommandPrefix"] + Guid.NewGuid().ToString("N"),
-                Targets = new List<string>(1) { "arn:aws:iot:" + config["AWS:Region"] +":" + config["AWS:AccountId"] +":thing/" + deviceId }
+                Document = document,
+                JobId = prefix + Guid.NewGuid().ToString("N"),
+                Targets = new List<string>(1) { "arn:aws:iot:" + config["AWS:Region"] + ":" + config["AWS:AccountId"] + ":thing/" + deviceId }
             };
             try
             {
-                clientresponse = await awsClientsService.IoTClient.CreateJobAsync(request);
+                var clientresponse = await awsClientsService.IoTClient.CreateJobAsync(request);
                 response.StatusCode = clientresponse.HttpStatusCode;
                 response.JobId = clientresponse.JobId;
                 response.JobUrl = config["BaseSystem:ServerUrl"] + "/api/jobs/" + clientresponse.JobId;
@@ -54,7 +66,7 @@ namespace VTV.OpsConsole.RemoteManagement.Services
 
         private string CreateJobDocument(Command cmd)
         {
-            var ttlc = DateTime.UtcNow.AddSeconds(cmd.TTL).ToString("o");
+            var ttlc = new DateTimeOffset(DateTime.UtcNow.AddSeconds(cmd.TTL)).ToUnixTimeSeconds();
             return $"{{\"operation\":\"RemoteManagement\", \"command\":\"{cmd.Name}\", \"ttlc\":\"{ttlc}\"}}";
         }
     }

@@ -5,15 +5,17 @@ using VTV.OpsConsole.RemoteManagement.Interfaces;
 using VTV.OpsConsole.RemoteManagement.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
-
+using Amazon.IoT;
+using System.Text.RegularExpressions;
+using Amazon.IoT.Model;
 namespace VTV.OpsConsole.RemoteManagement.Services
 {
-    public class DeviceService : IDeviceService
+    public class DeviceDetailsService : IDeviceDetailsService
     {
         private readonly IConfiguration config;
         private readonly IAWSClientsService awsClientsService;
 
-        public DeviceService(IAWSClientsService awsClientsService, IConfiguration configuration)
+        public DeviceDetailsService(IAWSClientsService awsClientsService, IConfiguration configuration)
         {
             this.awsClientsService = awsClientsService;
             this.config = configuration;
@@ -55,7 +57,36 @@ namespace VTV.OpsConsole.RemoteManagement.Services
             }
         }
 
-        private string GetStringFromStream(Stream stream)
+        public async Task<DeviceJobsModel> GetJobsForDeviceAsync(string id)
+        {
+            var jobs = new DeviceJobsModel();
+            var r = new Regex("\"command\":\"([a-z_-]*)\"", RegexOptions.IgnoreCase);
+            try
+            {
+                var data = await awsClientsService.IoTClient.ListJobExecutionsForThingAsync(new Amazon.IoT.Model.ListJobExecutionsForThingRequest { MaxResults = 25, ThingName = id, Status = JobExecutionStatus.QUEUED });  
+                foreach(var item in data.ExecutionSummaries)
+                {
+                    var docresp = await awsClientsService.IoTClient.GetJobDocumentAsync(new GetJobDocumentRequest { JobId = item.JobId });
+                    var m = r.Match(docresp.Document);
+                    var entry = new DeviceJobsEntryModel
+                    {
+                        JobId = item.JobId,
+                        JobUrl = config["BaseSystem:ServerUrl"] + "/api/jobs/" + item.JobId,
+                        Status = item.JobExecutionSummary.Status.Value,
+                        QueuedAt = item.JobExecutionSummary.QueuedAt,
+                        Command = (m.Success) ? m.Groups[1].Value : "Unknown command"
+                    };
+                    jobs.Jobs.Add(entry);
+                }
+                return jobs;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        private string GetStringFromStream(System.IO.Stream stream)
         {
             // Create a stream reader.
             using (StreamReader reader = new StreamReader(stream))

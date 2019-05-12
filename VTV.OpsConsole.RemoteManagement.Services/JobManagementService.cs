@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Amazon.IoT;
 using Amazon.IoT.Model;
 using VTV.OpsConsole.RemoteManagement.Interfaces;
+using VTV.OpsConsole.RemoteManagement.Models;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace VTV.OpsConsole.RemoteManagement.Services
 {
@@ -20,7 +23,7 @@ namespace VTV.OpsConsole.RemoteManagement.Services
 
         public async Task DeleteJobAsync(string jobId)
         {
-            var request = new DeleteJobRequest { JobId = jobId };
+            var request = new DeleteJobRequest { JobId = jobId, Force = true };
             try
             {
                 var response = await awsClientsService.IoTClient.DeleteJobAsync(request);
@@ -33,23 +36,20 @@ namespace VTV.OpsConsole.RemoteManagement.Services
 
         public async Task<JobDetailsResult> GetJobDetailsAsync(string jobId)
         {
-            DescribeJobResponse awsresponse;
             JobDetailsResult result = new JobDetailsResult();
-            var request = new DescribeJobRequest { JobId = jobId };
             try
             {
-                awsresponse = await awsClientsService.IoTClient.DescribeJobAsync(request);
+                var describeresp = await awsClientsService.IoTClient.DescribeJobAsync(new DescribeJobRequest { JobId = jobId });
                 result.JobId = jobId;
-                result.JobArn = awsresponse.Job.JobArn;
-                result.Comment = awsresponse.Job.Comment;
-                result.CompletedAt = awsresponse.Job.CompletedAt;
-                result.CreatedAt = awsresponse.Job.CreatedAt;
-                result.Description = awsresponse.Job.Description;
-                result.DocumentSource = awsresponse.DocumentSource;
-                result.LastUpdatedAt = awsresponse.Job.LastUpdatedAt;
-                result.Status = awsresponse.Job.Status.Value;
+                result.JobArn = describeresp.Job.JobArn;
+                result.Comment = describeresp.Job.Comment;
+                result.CompletedAt = describeresp.Job.CompletedAt;
+                result.CreatedAt = describeresp.Job.CreatedAt;
+                result.Description = describeresp.Job.Description;
+                result.LastUpdatedAt = describeresp.Job.LastUpdatedAt;
+                result.Status = describeresp.Job.Status.Value;
                 result.StatusCode = System.Net.HttpStatusCode.OK;
-                result.Targets = awsresponse.Job.Targets;
+                result.Targets = describeresp.Job.Targets;
             }
             catch (AmazonIoTException ex)
             {
@@ -57,6 +57,19 @@ namespace VTV.OpsConsole.RemoteManagement.Services
                 result.ErrorDescription = $"Internal Code: '{ex.StatusCode}' - {ex.Message}";
             }
             return result;
+        }
+
+        public async Task<JObject> GetJobDocumentAsync(string jobId)
+        {
+            try
+            {
+                var docresp = await awsClientsService.IoTClient.GetJobDocumentAsync(new GetJobDocumentRequest { JobId = jobId });
+                return JObject.Parse(docresp.Document);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
     }
 }

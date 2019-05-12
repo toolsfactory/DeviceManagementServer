@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using VTV.OpsConsole.RemoteManagement.Interfaces;
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
@@ -26,6 +27,19 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         {
             var result = await _jobManagementService.GetJobDetailsAsync(id);
             return result;
+        }
+
+        // GET: /Jobs/5/document
+        /// <summary>
+        /// Job document of the job
+        /// </summary>
+        /// <param name="id">Uniqued id of the job</param>
+        /// <returns>document</returns>
+        [HttpGet("{id}/document", Name = "GetJobDocument")]
+        public async Task<ActionResult<JObject>> GetJobDocumentAsync(string id)
+        {
+            var result = await _jobManagementService.GetJobDocumentAsync(id);
+            return Ok(result);
         }
 
         // DELETE: /Jobs/5
