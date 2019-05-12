@@ -21,9 +21,12 @@ namespace VTV.OpsConsole.RemoteManagement.Services
             this.config = config;
         }
 
-        public async Task<JobSendResult> SendCommandToDeviceAsync(string deviceId, Command command, JObject parameters = null)
+        public async Task<JobSendResult> SendCommandToDeviceAsync(string deviceId, Command command, JObject parameters)
         {
-            var response = await SendJobAsync(deviceId, this.config["BaseSystem:CommandPrefix"], CreateJobDocument(command));
+            var ttlc = new DateTimeOffset(DateTime.UtcNow.AddSeconds(command.TTL)).ToUnixTimeSeconds();
+            parameters.Add("operation", "RemoteManagement");
+            parameters.Add("command", command.Name);
+            var response = await SendJobAsync(deviceId, this.config["BaseSystem:CommandPrefix"], parameters.ToString());
             return response;
         }
 
@@ -62,12 +65,6 @@ namespace VTV.OpsConsole.RemoteManagement.Services
                 response.ErrorDescription = $"Internal Code: '{ex.StatusCode}' - {ex.Message}";
             }
             return response;
-        }
-
-        private string CreateJobDocument(Command cmd)
-        {
-            var ttlc = new DateTimeOffset(DateTime.UtcNow.AddSeconds(cmd.TTL)).ToUnixTimeSeconds();
-            return $"{{\"operation\":\"RemoteManagement\", \"command\":\"{cmd.Name}\", \"ttlc\":\"{ttlc}\"}}";
         }
     }
 }

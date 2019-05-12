@@ -92,7 +92,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
                 return NotFound();
 
             var cmd = commandManagementService.TryParseCommandAndParameters(command, "");
-            var result = await commandSendService.SendCommandToDeviceAsync(id, cmd.Command);
+            var result = await commandSendService.SendCommandToDeviceAsync(id, cmd.Command, parameters);
 
             if (result.StatusCode != System.Net.HttpStatusCode.OK)
                 return StatusCode((int)result.StatusCode, result.ErrorDescription);

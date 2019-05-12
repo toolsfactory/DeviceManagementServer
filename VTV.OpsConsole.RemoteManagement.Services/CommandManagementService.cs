@@ -125,7 +125,7 @@ namespace VTV.OpsConsole.RemoteManagement.Services
             {
                 return new CommandParsingResult() { StatusCode = System.Net.HttpStatusCode.NotFound };
             }
-            var cmd = new Command(template.Name, uint.Parse(this.config["BaseSystem.TTL"]));
+            var cmd = new Command(template.Name, uint.Parse(this.config["BaseSystem:TTL"]));
             return new CommandParsingResult() { StatusCode = System.Net.HttpStatusCode.OK, Command = cmd };
         }
 
