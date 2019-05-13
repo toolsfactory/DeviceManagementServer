@@ -12,13 +12,13 @@ namespace VTV.OpsConsole.RemoteManagement.Services
 {
     public class CommandManagementService : ICommandsManagementService
     {
-        private readonly IConfiguration config;
+        private readonly IConfiguration _config;
         private List<CommandTemplate> _AvailableCommands;
         public IReadOnlyList<CommandTemplate> AvailableCommands => _AvailableCommands;
 
         public CommandManagementService(IConfiguration config)
         {
-            this.config = config;
+            _config = config;
             _AvailableCommands = new List<CommandTemplate>(3);
             LoadCommandTemplates();
         }
@@ -118,15 +118,13 @@ namespace VTV.OpsConsole.RemoteManagement.Services
             _AvailableCommands.Add(new CommandTemplate("FlushBatchEvents"));
         }
 
-        public CommandParsingResult TryParseCommandAndParameters(string command, string body = "")
+        public (Command cmd, bool success) TryParseCommandAndParameters(string command, string body = "")
         {
             var template = GetCommandTemplate(command);
             if (template == null)
-            {
-                return new CommandParsingResult() { StatusCode = System.Net.HttpStatusCode.NotFound };
-            }
-            var cmd = new Command(template.Name, uint.Parse(this.config["BaseSystem:TTL"]));
-            return new CommandParsingResult() { StatusCode = System.Net.HttpStatusCode.OK, Command = cmd };
+                return (null, false);
+            var cmd = new Command(template.Name, uint.Parse(_config["BaseSystem:TTL"]));
+            return (cmd, true);
         }
 
         public CommandTemplate GetCommandTemplate(string command)

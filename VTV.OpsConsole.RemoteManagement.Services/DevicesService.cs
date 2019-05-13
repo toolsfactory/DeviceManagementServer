@@ -8,36 +8,29 @@ namespace VTV.OpsConsole.RemoteManagement.Services
 {
     public class DevicesService : IDevicesService
     {
-        private readonly IConfiguration config;
-        private readonly IAWSClientsService awsClientsService;
+        private readonly IConfiguration _config;
+        private readonly IAWSClientsService _awsClientsService;
 
         public DevicesService(IAWSClientsService awsClientsService, IConfiguration configuration)
         {
-            this.awsClientsService = awsClientsService;
-            this.config = configuration;
+            _awsClientsService = awsClientsService;
+            _config = configuration;
         }
 
         public async Task<DevicesListModel> GetDeviceListAsync()
         {
-            try
+            var data = await _awsClientsService.IoTClient.ListThingsInThingGroupAsync(new Amazon.IoT.Model.ListThingsInThingGroupRequest() { MaxResults = 100, ThingGroupName = _config["BaseSystem:ThingGroup"] });
+            var result = new DevicesListModel();
+            foreach (var item in data.Things)
             {
-                var data = await awsClientsService.IoTClient.ListThingsInThingGroupAsync(new Amazon.IoT.Model.ListThingsInThingGroupRequest() { MaxResults = 100, ThingGroupName = config["BaseSystem:ThingGroup"] });
-                var result = new DevicesListModel();
-                foreach (var item in data.Things)
+                result.Devices.Add(new DevicesListEntryModel()
                 {
-                    result.Devices.Add(new DevicesListEntryModel()
-                    {
-                        DeviceId = item,
-                        DeviceName = item,
-                        DeviceUrl = config["BaseSystem:ServerUrl"] + "/api/devices/"+item
-                    });
-                }
-                return result;
+                    DeviceId = item,
+                    DeviceName = item,
+                    DeviceUrl = _config["BaseSystem:ServerUrl"] + "/api/devices/"+item
+                });
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            return result;
         }
     }
 }

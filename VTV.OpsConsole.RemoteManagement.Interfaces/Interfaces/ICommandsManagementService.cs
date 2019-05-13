@@ -8,7 +8,7 @@ namespace VTV.OpsConsole.RemoteManagement.Interfaces
         IReadOnlyList<CommandTemplate> AvailableCommands { get; }
         void LoadCommandTemplates();
         bool CommandExists(string command);
-        CommandParsingResult TryParseCommandAndParameters(string command, string body = "");
+        (Command cmd, bool success) TryParseCommandAndParameters(string command, string body = "");
         CommandTemplate GetCommandTemplate(string cmd);
     }
 }

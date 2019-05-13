@@ -1,7 +1,8 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 using VTV.OpsConsole.RemoteManagement.Interfaces;
+using VTV.OpsConsole.RemoteManagement.Models;
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 {
@@ -13,7 +14,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 
         public JobsController(IJobManagementService jobManagementService)
         {
-            this._jobManagementService = jobManagementService;
+            _jobManagementService = jobManagementService;
         }
 
         // GET: /Jobs/5
@@ -23,7 +24,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         /// <param name="id">Uniqued id of the job</param>
         /// <returns>Status details</returns>
         [HttpGet("{id}", Name = "GetJob")]
-        public async Task<ActionResult<JobDetailsResult>> GetJobAsync(string id)
+        public async Task<ActionResult<JobDetailsModel>> GetJobAsync(string id)
         {
             var result = await _jobManagementService.GetJobDetailsAsync(id);
             return result;

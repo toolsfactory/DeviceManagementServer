@@ -18,7 +18,7 @@ namespace VTV.OpsConsole.RemoteManagement.Services
         public AmazonIoTJobsDataPlaneClient IoTJobClient { get; private set; }
 
         public AWSClientsService(IConfiguration config) {
-            this._config = config;
+            _config = config;
             var awsCredentials = new BasicAWSCredentials(_config["AWS:ApiAccessKey"], _config["AWS:ApiSecretKey"]);
             IoTClient = new AmazonIoTClient(awsCredentials, RegionEndpoint.GetBySystemName(_config["AWS:Region"]));
             IoTDataClient = new AmazonIotDataClient("https://" + _config["AWS:IoTEndpoint"], awsCredentials);

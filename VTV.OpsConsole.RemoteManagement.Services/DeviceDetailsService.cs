@@ -12,78 +12,57 @@ namespace VTV.OpsConsole.RemoteManagement.Services
 {
     public class DeviceDetailsService : IDeviceDetailsService
     {
-        private readonly IConfiguration config;
-        private readonly IAWSClientsService awsClientsService;
+        private readonly IConfiguration _config;
+        private readonly IAWSClientsService _awsClientsService;
 
         public DeviceDetailsService(IAWSClientsService awsClientsService, IConfiguration configuration)
         {
-            this.awsClientsService = awsClientsService;
-            this.config = configuration;
+            _awsClientsService = awsClientsService;
+            _config = configuration;
         }
 
         public async Task<DeviceDetailsModel> GetDeviceDetailsAsync(string id)
         {
-            try
+            var data = await _awsClientsService.IoTClient.DescribeThingAsync(new Amazon.IoT.Model.DescribeThingRequest() { ThingName = id });
+            var result = new DeviceDetailsModel()
             {
-                var data = await awsClientsService.IoTClient.DescribeThingAsync(new Amazon.IoT.Model.DescribeThingRequest() { ThingName = id });
-                var result = new DeviceDetailsModel()
-                {
-                    Name = data.ThingName,
-                    Id = data.ThingId,
-                    Version = data.Version,
-                    TypeName = data.ThingTypeName,
-                    CommandsUrl = config["BaseSystem:ServerUrl"] + "/api/devices/" + id + "/commands"
-                };
-                foreach(var attr in data.Attributes)
-                { result.Attributes.Add(attr.Key, attr.Value); }
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+                Name = data.ThingName,
+                Id = data.ThingId,
+                Version = data.Version,
+                TypeName = data.ThingTypeName,
+                CommandsUrl = _config["BaseSystem:ServerUrl"] + "/api/devices/" + id + "/commands"
+            };
+            foreach(var attr in data.Attributes)
+            { result.Attributes.Add(attr.Key, attr.Value); }
+            return result;
         }
 
         public async Task<JObject> GetDeviceShadowAsync(string id)
         {
-            try
-            {
-                var data = await awsClientsService.IoTDataClient.GetThingShadowAsync(new Amazon.IotData.Model.GetThingShadowRequest() { ThingName = id });
-                return JObject.Parse(GetStringFromStream(data.Payload));
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            var data = await _awsClientsService.IoTDataClient.GetThingShadowAsync(new Amazon.IotData.Model.GetThingShadowRequest() { ThingName = id });
+            return JObject.Parse(GetStringFromStream(data.Payload));
         }
 
         public async Task<DeviceJobsModel> GetJobsForDeviceAsync(string id)
         {
             var jobs = new DeviceJobsModel();
             var r = new Regex("\"command\":\"([a-z_-]*)\"", RegexOptions.IgnoreCase);
-            try
+            var data = await _awsClientsService.IoTClient.ListJobExecutionsForThingAsync(new Amazon.IoT.Model.ListJobExecutionsForThingRequest { MaxResults = 25, ThingName = id, Status = JobExecutionStatus.QUEUED });  
+            foreach(var item in data.ExecutionSummaries)
             {
-                var data = await awsClientsService.IoTClient.ListJobExecutionsForThingAsync(new Amazon.IoT.Model.ListJobExecutionsForThingRequest { MaxResults = 25, ThingName = id, Status = JobExecutionStatus.QUEUED });  
-                foreach(var item in data.ExecutionSummaries)
+                var docresp = await _awsClientsService.IoTClient.GetJobDocumentAsync(new GetJobDocumentRequest { JobId = item.JobId });
+                var m = r.Match(docresp.Document);
+                var entry = new DeviceJobsEntryModel
                 {
-                    var docresp = await awsClientsService.IoTClient.GetJobDocumentAsync(new GetJobDocumentRequest { JobId = item.JobId });
-                    var m = r.Match(docresp.Document);
-                    var entry = new DeviceJobsEntryModel
-                    {
-                        JobId = item.JobId,
-                        JobUrl = config["BaseSystem:ServerUrl"] + "/api/jobs/" + item.JobId,
-                        Status = item.JobExecutionSummary.Status.Value,
-                        QueuedAt = item.JobExecutionSummary.QueuedAt,
-                        Command = (m.Success) ? m.Groups[1].Value : "Unknown command"
-                    };
-                    jobs.Jobs.Add(entry);
-                }
-                return jobs;
+                    JobId = item.JobId,
+                    JobUrl = _config["BaseSystem:ServerUrl"] + "/api/jobs/" + item.JobId,
+                    Status = item.JobExecutionSummary.Status.Value,
+                    QueuedAt = item.JobExecutionSummary.QueuedAt,
+                    Command = (m.Success) ? m.Groups[1].Value : "Unknown command"
+                };
+                jobs.Jobs.Add(entry);
             }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            return jobs;
         }
 
         private string GetStringFromStream(System.IO.Stream stream)

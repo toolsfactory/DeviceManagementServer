@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Amazon;
-using Amazon.SecretsManager;
-using Amazon.SecretsManager.Model;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
@@ -17,13 +11,13 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 
         public StatusController(IConfiguration config)
         {
-            this._config = config;
+            _config = config;
         }
 
         [HttpGet]
         public ActionResult Get()
         {
-            var result = this._config["Environment:Name"] + " - " + (_config["AWS:ApiAccessKey"].StartsWith("AKIA")) + " - " + _config["BaseSystem:ServerUrl"];
+            var result = _config["Environment:Name"] + " - " + (_config["AWS:ApiAccessKey"].StartsWith("AKIA")) + " - " + _config["BaseSystem:ServerUrl"];
             return Ok(result);
         }
     }

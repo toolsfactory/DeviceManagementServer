@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using VTV.OpsConsole.RemoteManagement.Models;
-using VTV.OpsConsole.RemoteManagement.APIServer.Models;
 using VTV.OpsConsole.RemoteManagement.Interfaces;
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
@@ -14,17 +11,17 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
     [ApiController]
     public class DevicesController : ControllerBase
     {
-        private readonly IDevicesService devicesService;
-        private readonly IDeviceDetailsService deviceService;
-        private readonly ICommandSendService commandSendService;
-        private readonly ICommandsManagementService commandManagementService;
+        private readonly IDevicesService _devicesService;
+        private readonly IDeviceDetailsService _deviceDetailsService;
+        private readonly ICommandSendService _commandSendService;
+        private readonly ICommandsManagementService _commandManagementService;
 
         public DevicesController(IDevicesService devicesService, IDeviceDetailsService deviceService, ICommandSendService commandSendService, ICommandsManagementService commandManagementService)
         {
-            this.devicesService = devicesService;
-            this.deviceService = deviceService;
-            this.commandSendService = commandSendService;
-            this.commandManagementService = commandManagementService;
+            _devicesService = devicesService;
+            _deviceDetailsService = deviceService;
+            _commandSendService = commandSendService;
+            _commandManagementService = commandManagementService;
         }
 
         // GET api/devices
@@ -35,7 +32,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<DevicesListModel>> GetAsync()
         {
-            var devices = await devicesService.GetDeviceListAsync();
+            var devices = await _devicesService.GetDeviceListAsync();
             return Ok(devices);
         }
 
@@ -48,7 +45,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<DeviceDetailsModel>> GetDeviceAsync(string id)
         {
-            return Ok(await deviceService.GetDeviceDetailsAsync(id));
+            return Ok(await _deviceDetailsService.GetDeviceDetailsAsync(id));
         }
 
         // GET api/devices/stb-123abc/shadow
@@ -60,7 +57,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         [HttpGet("{id}/shadow")]
         public async Task<ActionResult<JObject>> GetDeviceShadowAsync(string id)
         {
-            return Ok(await deviceService.GetDeviceShadowAsync(id));
+            return Ok(await _deviceDetailsService.GetDeviceShadowAsync(id));
         }
 
         // GET api/devices/stb-123abc/commands
@@ -72,7 +69,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         [HttpGet("{id}/commands")]
         public async Task<ActionResult<IReadOnlyList<DeviceJobsModel>>> GetDeviceCommands(string id)
         {
-            return Ok(await deviceService.GetJobsForDeviceAsync(id));
+            return Ok(await _deviceDetailsService.GetJobsForDeviceAsync(id));
         }
 
         // POST api/devices/stb-123abc/commands/reboot
@@ -82,21 +79,17 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         /// <param name="id">Unique Id of the device</param>
         /// <param name="command">name of the command to be sent</param>
         /// <param name="parameters">optional parameters send in the body of the request.</param>
-        /// 
         /// <returns>job details</returns>
         /// <remarks>Remark: if no parameters are available or set, request body must at least be "{}".</remarks>
         [HttpPost("{id}/commands/{command}")]
-        public async Task<ActionResult<JobSendResult>> PostCommandAsync(string id, string command, [FromBody] JObject parameters)
+        public async Task<ActionResult<CommandSendModel>> PostCommandAsync(string id, string command, [FromBody] JObject parameters)
         {
-            if (!commandManagementService.CommandExists(command))
-                return NotFound();
-
-            var cmd = commandManagementService.TryParseCommandAndParameters(command, "");
-            var result = await commandSendService.SendCommandToDeviceAsync(id, cmd.Command, parameters);
-
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
-                return StatusCode((int)result.StatusCode, result.ErrorDescription);
-            
+            if (!_commandManagementService.CommandExists(command))
+                return NotFound($"Command '{command}' doesn't exist.");
+            var response = _commandManagementService.TryParseCommandAndParameters(command, "");
+            if (!response.success)
+                return BadRequest("Invalid command request.");
+            var result = await _commandSendService.SendCommandToDeviceAsync(id, response.cmd, parameters);
             return result;
         }
 
@@ -106,17 +99,12 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         /// </summary>
         /// <param name="id">Unique Id of the device</param>
         /// <param name="parameters">optional parameters send in the body of the request.</param>
-        /// 
         /// <returns>job details</returns>
         /// <remarks>Remark: if no parameters are available or set, request body must at least be "{}".</remarks>
         [HttpPost("{id}/customjob")]
-        public async Task<ActionResult<JobSendResult>> PostCustomJobAsync(string id, [FromBody] JObject parameters)
+        public async Task<ActionResult<CommandSendModel>> PostCustomJobAsync(string id, [FromBody] JObject parameters)
         {
-            var result = await commandSendService.SendCustomJobToDeviceAsync(id, parameters);
-
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
-                return StatusCode((int)result.StatusCode, result.ErrorDescription);
-
+            var result = await _commandSendService.SendCustomCommandToDeviceAsync(id, parameters);
             return result;
         }
     }

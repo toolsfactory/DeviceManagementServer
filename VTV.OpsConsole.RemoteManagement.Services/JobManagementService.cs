@@ -12,64 +12,42 @@ namespace VTV.OpsConsole.RemoteManagement.Services
 {
     public class JobManagementService : IJobManagementService
     {
-        private readonly IAWSClientsService awsClientsService;
-        private readonly IConfiguration config;
+        private readonly IAWSClientsService _awsClientsService;
+        private readonly IConfiguration _config;
 
         public JobManagementService(IAWSClientsService awsClientsService, IConfiguration config)
         {
-            this.awsClientsService = awsClientsService;
-            this.config = config;
+            _awsClientsService = awsClientsService;
+            _config = config;
         }
 
         public async Task DeleteJobAsync(string jobId)
         {
             var request = new DeleteJobRequest { JobId = jobId, Force = true };
-            try
-            {
-                var response = await awsClientsService.IoTClient.DeleteJobAsync(request);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            var response = await _awsClientsService.IoTClient.DeleteJobAsync(request);
         }
 
-        public async Task<JobDetailsResult> GetJobDetailsAsync(string jobId)
+        public async Task<JobDetailsModel> GetJobDetailsAsync(string jobId)
         {
-            JobDetailsResult result = new JobDetailsResult();
-            try
+            var describeresp = await _awsClientsService.IoTClient.DescribeJobAsync(new DescribeJobRequest { JobId = jobId });
+            return new JobDetailsModel()
             {
-                var describeresp = await awsClientsService.IoTClient.DescribeJobAsync(new DescribeJobRequest { JobId = jobId });
-                result.JobId = jobId;
-                result.JobArn = describeresp.Job.JobArn;
-                result.Comment = describeresp.Job.Comment;
-                result.CompletedAt = describeresp.Job.CompletedAt;
-                result.CreatedAt = describeresp.Job.CreatedAt;
-                result.Description = describeresp.Job.Description;
-                result.LastUpdatedAt = describeresp.Job.LastUpdatedAt;
-                result.Status = describeresp.Job.Status.Value;
-                result.StatusCode = System.Net.HttpStatusCode.OK;
-                result.Targets = describeresp.Job.Targets;
-            }
-            catch (AmazonIoTException ex)
-            {
-                result.StatusCode = System.Net.HttpStatusCode.InternalServerError;
-                result.ErrorDescription = $"Internal Code: '{ex.StatusCode}' - {ex.Message}";
-            }
-            return result;
+                JobId = jobId,
+                JobArn = describeresp.Job.JobArn,
+                Comment = describeresp.Job.Comment,
+                CompletedAt = describeresp.Job.CompletedAt,
+                CreatedAt = describeresp.Job.CreatedAt,
+                Description = describeresp.Job.Description,
+                LastUpdatedAt = describeresp.Job.LastUpdatedAt,
+                Status = describeresp.Job.Status.Value,
+                Targets = describeresp.Job.Targets
+            };
         }
 
         public async Task<JObject> GetJobDocumentAsync(string jobId)
         {
-            try
-            {
-                var docresp = await awsClientsService.IoTClient.GetJobDocumentAsync(new GetJobDocumentRequest { JobId = jobId });
-                return JObject.Parse(docresp.Document);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            var docresp = await _awsClientsService.IoTClient.GetJobDocumentAsync(new GetJobDocumentRequest { JobId = jobId });
+            return JObject.Parse(docresp.Document);
         }
     }
 }

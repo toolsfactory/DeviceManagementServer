@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using VTV.OpsConsole.RemoteManagement.Models;
-using VTV.OpsConsole.RemoteManagement.APIServer.Models;
 using VTV.OpsConsole.RemoteManagement.Interfaces;
 using Microsoft.Extensions.Configuration;
 
@@ -15,16 +10,16 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
     [ApiController]
     public class CommandsController : ControllerBase
     {
-        private readonly ICommandSendService commandSendService;
-        private readonly ICommandsManagementService commandManagementService;
-        private readonly IConfiguration config;
+        private readonly ICommandSendService _commandSendService;
+        private readonly ICommandsManagementService _commandManagementService;
+        private readonly IConfiguration _config;
 
 
         public CommandsController(ICommandSendService commandSendService, ICommandsManagementService commandManagementService, IConfiguration configuration)
         {
-            this.commandSendService = commandSendService;
-            this.commandManagementService = commandManagementService;
-            this.config = configuration;
+            _commandSendService = commandSendService;
+            _commandManagementService = commandManagementService;
+            _config = configuration;
         }
 
         // GET api/commands
@@ -35,13 +30,13 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         [HttpGet()]
         public ActionResult<IList<CommandInfoModel>> GetCommands()
         {
-            var commands = new List<CommandInfoModel>(commandManagementService.AvailableCommands.Count);
-            foreach (var item in commandManagementService.AvailableCommands)
+            var commands = new List<CommandInfoModel>(_commandManagementService.AvailableCommands.Count);
+            foreach (var item in _commandManagementService.AvailableCommands)
             {
                 commands.Add(new CommandInfoModel
                 {
                     Name = item.Name,
-                    Url = config["BaseSystem:ServerUrl"] + "/api/commands/" + item.Name
+                    Url = _config["BaseSystem:ServerUrl"] + "/api/commands/" + item.Name
                 });
             }
             return Ok(commands);
@@ -56,10 +51,10 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         [HttpGet("{command}")]
         public ActionResult<CommandTemplate> GetCommandDetails(string command)
         {
-            if (!commandManagementService.CommandExists(command))
+            if (!_commandManagementService.CommandExists(command))
                 return NotFound();
 
-            return Ok(commandManagementService.GetCommandTemplate(command));
+            return Ok(_commandManagementService.GetCommandTemplate(command));
         }
 
     }
