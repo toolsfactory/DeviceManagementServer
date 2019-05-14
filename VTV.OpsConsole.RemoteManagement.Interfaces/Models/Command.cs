@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace VTV.OpsConsole.RemoteManagement.Models
 {
@@ -6,26 +7,24 @@ namespace VTV.OpsConsole.RemoteManagement.Models
     {
         String,
         Integer,
-        boolean
+        Boolean
     }
 
     public class CommandParameter
     {
-        public string Name { get; private set; }
-        public string Value { get; private set; }
-        public CommandParameterType ParameterType { get; private set; }
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public JTokenType ParameterType { get; set; }
     }
 
     public class Command
     {
-        public string Name { get; private set; }
-        public uint TTL { get; private set; }
-        public IList<CommandParameter> Parameters { get; private set; }
-        public Command(string name, uint ttl, IList<CommandParameter> parameters = null)
+        public string Name { get; set; }
+        public IList<CommandParameter> Parameters { get; set; }
+        public Command(string name, IList<CommandParameter> parameters = null)
         {
             Name = name;
-            TTL = ttl;
-            Parameters = parameters;
+            Parameters = (parameters == null) ? new List<CommandParameter>(10) : parameters;
         }
     }
 }

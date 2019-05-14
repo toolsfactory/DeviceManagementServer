@@ -2,11 +2,10 @@
 
 namespace VTV.OpsConsole.RemoteManagement.Models
 {
-    public class CommandSendModel
+    public class CreateCommandDocumentResponse
     {
-        public string JobId { get; set; }
-        public string JobUrl { get; set; }
+        public bool Success { get; set; }
         public JObject Document { get; set; }
+        public string ErrorText { get; set; }
     }
-
 }

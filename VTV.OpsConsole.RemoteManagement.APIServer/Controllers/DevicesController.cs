@@ -79,17 +79,20 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         /// <param name="id">Unique Id of the device</param>
         /// <param name="command">name of the command to be sent</param>
         /// <param name="parameters">optional parameters send in the body of the request.</param>
+        /// <param name="ttl">optional value for the ttl overwriting the default 90 seconds</param>
+        /// <param name="checktypes">defines if the system check for correct types of know parameters</param>
+        /// <param name="checkmandatory">defines if the system checks that al mandatory fields are there</param>
         /// <returns>job details</returns>
         /// <remarks>Remark: if no parameters are available or set, request body must at least be "{}".</remarks>
         [HttpPost("{id}/commands/{command}")]
-        public async Task<ActionResult<CommandSendModel>> PostCommandAsync(string id, string command, [FromBody] JObject parameters)
+        public async Task<ActionResult<CommandSendModel>> PostCommandAsync(string id, string command, [FromBody] JObject parameters, [FromQuery] int ttl = 90, [FromQuery] bool checktypes = false, [FromQuery] bool checkmandatory = false)
         {
             if (!_commandManagementService.CommandExists(command))
                 return NotFound($"Command '{command}' doesn't exist.");
-            var response = _commandManagementService.TryParseCommandAndParameters(command, "");
-            if (!response.success)
-                return BadRequest("Invalid command request.");
-            var result = await _commandSendService.SendCommandToDeviceAsync(id, response.cmd, parameters);
+            var response = _commandManagementService.CreateCommandDocument(new CreateCommandDocumentRequest() { Command = command, Body = parameters, TTL = ttl, CheckTypes = checktypes, CheckRequired = checkmandatory });
+            if (!response.Success)
+                return BadRequest("Invalid command request. "+ response.ErrorText);
+            var result = await _commandSendService.SendCommandToDeviceAsync(id, response.Document);
             return result;
         }
 

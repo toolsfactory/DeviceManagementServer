@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace VTV.OpsConsole.RemoteManagement.Models
 {
@@ -8,7 +9,7 @@ namespace VTV.OpsConsole.RemoteManagement.Models
         public bool Required { get; set; } = false;
         public string ValidationRegex { get; set; } = "";
         public string Description { get; set; }
-        public CommandParameterType ParameterType { get; set; } = CommandParameterType.String;
+        public JTokenType ParameterType { get; set; } = JTokenType.String;
     }
 
     public class CommandTemplate

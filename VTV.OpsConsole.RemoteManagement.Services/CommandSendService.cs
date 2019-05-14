@@ -22,34 +22,32 @@ namespace VTV.OpsConsole.RemoteManagement.Services
             _config = config;
         }
 
-        public async Task<CommandSendModel> SendCommandToDeviceAsync(string deviceId, Command command, JObject parameters)
+        public async Task<CommandSendModel> SendCommandToDeviceAsync(string deviceId, JObject command)
         {
-            var ttlc = new DateTimeOffset(DateTime.UtcNow.AddSeconds(command.TTL)).ToUnixTimeSeconds();
-            parameters.Add("operation", "RemoteManagement");
-            parameters.Add("command", command.Name);
-            var response = await SendCommandAsync(deviceId, _config["BaseSystem:CommandPrefix"], parameters.ToString());
+            var response = await SendCommandAsync(deviceId, _config["BaseSystem:CommandPrefix"], command);
             return response;
         }
 
         public async Task<CommandSendModel> SendCustomCommandToDeviceAsync(string deviceId, JObject data)
         {
             data.Add("operation", "RemoteManagement");
-            var response = await SendCommandAsync(deviceId, _config["BaseSystem:CustomJobPrefix"], data.ToString());
+            var response = await SendCommandAsync(deviceId, _config["BaseSystem:CustomJobPrefix"], data);
             return response;
         }
 
-        private async Task<CommandSendModel> SendCommandAsync(string deviceId, string prefix, string document)
+        private async Task<CommandSendModel> SendCommandAsync(string deviceId, string prefix, JObject document)
         {
             CommandSendModel response = new CommandSendModel();
             var request = new Amazon.IoT.Model.CreateJobRequest()
             {
-                Document = document,
+                Document = document.ToString(),
                 JobId = prefix + Guid.NewGuid().ToString("N"),
                 Targets = new List<string>(1) { "arn:aws:iot:" + _config["AWS:Region"] + ":" + _config["AWS:AccountId"] + ":thing/" + deviceId }
             };
             var clientresponse = await _awsClientsService.IoTClient.CreateJobAsync(request);
             response.JobId = clientresponse.JobId;
             response.JobUrl = _config["BaseSystem:ServerUrl"] + "/api/jobs/" + clientresponse.JobId;
+            response.Document = document;
             return response;
         }
     }
