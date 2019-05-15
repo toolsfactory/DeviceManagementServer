@@ -18,9 +18,9 @@ namespace VTV.OpsConsole.RemoteManagement.Tests
         [Test]
         public void PositiveSimpleCase()
         {
-            var document = @"{
+            var document = @"{ 'parameters': {
     'firmwareImageFile' : 'demo.img',
-    'firmwareImageLocation' : 'http://demo.server.de/src/'}";
+    'firmwareImageLocation' : 'http://demo.server.de/src/'}}";
 
             var resp = _service.CreateCommandDocument(
                 new VTV.OpsConsole.RemoteManagement.Models.CreateCommandDocumentRequest()

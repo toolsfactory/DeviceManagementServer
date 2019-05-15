@@ -46,19 +46,17 @@ namespace VTV.OpsConsole.RemoteManagement.Services
         public async Task<DeviceJobsModel> GetJobsForDeviceAsync(string id)
         {
             var jobs = new DeviceJobsModel();
-            var r = new Regex("\"command\":\"([a-z_-]*)\"", RegexOptions.IgnoreCase);
             var data = await _awsClientsService.IoTClient.ListJobExecutionsForThingAsync(new Amazon.IoT.Model.ListJobExecutionsForThingRequest { MaxResults = 25, ThingName = id, Status = JobExecutionStatus.QUEUED });  
             foreach(var item in data.ExecutionSummaries)
             {
                 var docresp = await _awsClientsService.IoTClient.GetJobDocumentAsync(new GetJobDocumentRequest { JobId = item.JobId });
-                var m = r.Match(docresp.Document);
                 var entry = new DeviceJobsEntryModel
                 {
                     JobId = item.JobId,
                     JobUrl = _config["BaseSystem:ServerUrl"] + "/api/jobs/" + item.JobId,
                     Status = item.JobExecutionSummary.Status.Value,
                     QueuedAt = item.JobExecutionSummary.QueuedAt,
-                    Command = (m.Success) ? m.Groups[1].Value : "Unknown command"
+                    Document = JObject.Parse(docresp.Document)
                 };
                 jobs.Jobs.Add(entry);
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace VTV.OpsConsole.RemoteManagement.Models
         public string JobId { get; set; }
         public DateTime QueuedAt { get; set; }
         public string Status { get; set; }
-        public string Command { get; set; }
+        public JObject Document { get; set; }
         public string JobUrl { get; set; }
     }
 }
