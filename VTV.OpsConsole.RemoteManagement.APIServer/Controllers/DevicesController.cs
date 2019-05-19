@@ -81,11 +81,12 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         /// <param name="parameters">optional parameters send in the body of the request.</param>
         /// <param name="ttl">optional value for the ttl overwriting the default 90 seconds</param>
         /// <param name="checktypes">defines if the system check for correct types of know parameters</param>
-        /// <param name="checkmandatory">defines if the system checks that al mandatory fields are there</param>
+        /// <param name="checkmandatory">defines if the system checks that all mandatory fields are there</param>
+        /// <param name="checkvalues">defines if the system checks that fields with predefined values are correct</param>
         /// <returns>job details</returns>
         /// <remarks>Remark: if no parameters are available or set, request body must at least be "{}".</remarks>
         [HttpPost("{id}/commands/{command}")]
-        public async Task<ActionResult<CommandSendModel>> PostCommandAsync(string id, string command, [FromBody] JObject parameters, [FromQuery] int ttl = 90, [FromQuery] bool checktypes = false, [FromQuery] bool checkmandatory = false)
+        public async Task<ActionResult<CommandSendModel>> PostCommandAsync(string id, string command, [FromBody] JObject parameters, [FromQuery] int ttl = 90, [FromQuery] bool checktypes = false, [FromQuery] bool checkmandatory = false, [FromQuery] bool checkvalues = false)
         {
             if (!_commandManagementService.CommandExists(command))
                 return NotFound($"Command '{command}' doesn't exist.");

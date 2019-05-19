@@ -5,6 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="commands.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="commands.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
     <PackageReference Include="AWSSDK.IoT" Version="3.3.100.17" />
     <PackageReference Include="AWSSDK.IotData" Version="3.3.100.17" />

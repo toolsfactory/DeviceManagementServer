@@ -9,5 +9,6 @@ namespace VTV.OpsConsole.RemoteManagement.Models
         public int TTL { get; set; }
         public bool CheckTypes { get; set; }
         public bool CheckRequired { get; set; }
+        public bool CheckValues { get; set; }
     }
 }

@@ -33,5 +33,37 @@ namespace VTV.OpsConsole.RemoteManagement.Tests
                 });
             Assert.IsTrue(resp.Success);
         }
+
+        [Test]
+        public void CreateDocumentWithParametersOk()
+        {
+            var parameters = @"{ 
+    'firmwareImageFile' : 'demo.img',
+    'firmwareImageLocation' : 'http://demo.server.de/src/'}";
+            var expecteddoc = 
+@"{
+    'operation': 'remoteManagement',
+    'ttl': 1234567890,
+    'message': {
+        'command': 'updateToSpecificFirmware',
+        'parameters': {
+            'firmwareImageFile' : 'demo.img',
+            'firmwareImageLocation' : 'http://demo.server.de/src/'}
+        }
+    }
+} ";
+
+            var resp = _service.CreateCommandDocument(
+                new VTV.OpsConsole.RemoteManagement.Models.CreateCommandDocumentRequest()
+                {
+                    Command = "updateToSpecificFirmware",
+                    Body = JObject.Parse(parameters),
+                    TTL = 45,
+                    CheckRequired = true,
+                    CheckTypes = true
+                });
+            Assert.IsTrue(resp.Success);
+        }
+
     }
 }

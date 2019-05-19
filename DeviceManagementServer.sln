@@ -14,7 +14,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VTV.OpsConsole.RemoteManage
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VTV.OpsConsole.RemoteManagement.Interfaces", "VTV.OpsConsole.RemoteManagement.Interfaces\VTV.OpsConsole.RemoteManagement.Interfaces.csproj", "{7E88CAF0-C836-4C5B-AA2B-28A2D58B0319}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VTV.OpsConsole.RemoteManagement.Tests", "VTV.OpsConsole.RemoteManagement.Tests\VTV.OpsConsole.RemoteManagement.Tests.csproj", "{69807193-0125-46D5-AB51-8ED2D4D38BF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VTV.OpsConsole.RemoteManagement.Tests", "VTV.OpsConsole.RemoteManagement.Tests\VTV.OpsConsole.RemoteManagement.Tests.csproj", "{69807193-0125-46D5-AB51-8ED2D4D38BF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VTV.OpsConsole.REmoteManagement.SecureAPIServer", "VTV.OpsConsole.REmoteManagement.SecureAPIServer\VTV.OpsConsole.REmoteManagement.SecureAPIServer.csproj", "{50402CF3-D685-4BFB-B462-23D788D1DC90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{69807193-0125-46D5-AB51-8ED2D4D38BF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69807193-0125-46D5-AB51-8ED2D4D38BF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69807193-0125-46D5-AB51-8ED2D4D38BF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50402CF3-D685-4BFB-B462-23D788D1DC90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50402CF3-D685-4BFB-B462-23D788D1DC90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50402CF3-D685-4BFB-B462-23D788D1DC90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50402CF3-D685-4BFB-B462-23D788D1DC90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

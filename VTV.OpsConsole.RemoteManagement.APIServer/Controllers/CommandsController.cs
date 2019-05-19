@@ -48,6 +48,15 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         /// </summary>
         /// <param name="command">command name</param>
         /// <returns>information</returns>
+        /// <remarks>
+        /// Possible values for command.parameters.type:
+        /// Object = 1
+        /// Array = 2
+        /// Integer = 6
+        /// Float = 7
+        /// String = 8
+        /// Boolean = 9
+        /// </remarks>
         [HttpGet("{command}")]
         public ActionResult<CommandTemplate> GetCommandDetails(string command)
         {

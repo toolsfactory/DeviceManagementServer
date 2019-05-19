@@ -7,7 +7,7 @@ namespace VTV.OpsConsole.RemoteManagement.Models
     {
         public string Name { get; set; }
         public bool Required { get; set; } = false;
-        public string ValidationRegex { get; set; } = "";
+        public string AcceptedValues { get; set; } = "";
         public string Description { get; set; }
         public JTokenType ParameterType { get; set; } = JTokenType.String;
     }
