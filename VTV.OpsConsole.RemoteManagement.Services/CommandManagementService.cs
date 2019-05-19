@@ -6,36 +6,89 @@ using Newtonsoft.Json.Linq;
 using System.Reflection;
 using System.IO;
 using Newtonsoft.Json;
+using System.Net;
+using Microsoft.Extensions.Configuration;
 
 namespace VTV.OpsConsole.RemoteManagement.Services
 {
     public class CommandManagementService : ICommandsManagementService
     {
         private List<CommandTemplate> _AvailableCommands;
+        private readonly IConfiguration _config;
+
         public IReadOnlyList<CommandTemplate> AvailableCommands => _AvailableCommands;
 
-        public CommandManagementService()
+        public bool CommandTemplatesLoaded { get; private set; }
+
+        public bool CommandTemplatesParsed { get; private set; }
+
+        public string CommandTemplatesLoadAndParseErrorText { get; private set; }
+
+        public string CommandTemplatesSource { get; private set; }
+
+        public string CommandTemplateVersion { get; private set; }
+
+        public string CommandTemplateAuthor { get; private set; }
+
+        public CommandManagementService(IConfiguration config)
         {
             _AvailableCommands = new List<CommandTemplate>(3);
+            _config = config;
             LoadCommandTemplates();
+        }
 
+        private void CleanUpStatus()
+        {
+            CommandTemplatesLoaded = false;
+            CommandTemplatesParsed = false;
+            CommandTemplatesSource = "";
+            CommandTemplatesLoadAndParseErrorText = "";
+            if (_AvailableCommands != null)
+                _AvailableCommands.Clear();
+            _AvailableCommands = null;
+            CommandTemplateVersion = "";
+            CommandTemplateAuthor = "";
         }
 
         public void LoadCommandTemplates()
         {
-            /*
-            var assembly = Assembly.GetCallingAssembly();
-            var resourceName = "VTV.OpsConsole.RemoteManagement.Services.commands.json";
-            string json = "";
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (StreamReader reader = new StreamReader(stream))
+            CleanUpStatus();
+            string cmds = "";
+            try
             {
-                json = reader.ReadToEnd();
+                CommandTemplatesSource = _config["AWS:S3CommandsURL"];
+                cmds = LoadCommandsFromS3();
+                CommandTemplatesLoaded = true;
             }
-            */
-            JObject o = JObject.Parse(Commands.Text);
+            catch (Exception ex)
+            {
+                CommandTemplatesLoadAndParseErrorText = "Commands json could not be loaded. " + ex.Message;
+                return;
+            }
+            try
+            {
+                JObject o = JObject.Parse(cmds);
+                _AvailableCommands = o["commands"].ToObject<List<CommandTemplate>>();
+                CommandTemplateVersion = o["version"].ToString();
+                CommandTemplateAuthor = o["author"].ToString();
+                CommandTemplatesParsed = true;
+            }
+            catch (Exception ex)
+            {
+                CommandTemplatesLoadAndParseErrorText = "Commands json could not be parsed. " + ex.Message;
+            }
 
-            _AvailableCommands = o["commands"].ToObject<List<CommandTemplate>>();
+        }
+
+        private string LoadCommandsFromS3()
+        {
+            WebClient client = new WebClient();
+            Stream data = client.OpenRead(CommandTemplatesSource);
+            StreamReader reader = new StreamReader(data);
+            string s = reader.ReadToEnd();
+            data.Close();
+            reader.Close();
+            return s;
         }
 
         public bool CommandExists(string command)

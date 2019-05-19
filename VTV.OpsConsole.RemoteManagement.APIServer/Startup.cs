@@ -51,6 +51,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer
             services.AddSingleton<ICommandSendService, CommandSendService>();
             services.AddSingleton<ICommandsManagementService, CommandManagementService>();
             services.AddSingleton<IJobManagementService, JobManagementService>();
+            services.AddSingleton<IStartupTask, StartupTasks.Initializer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
