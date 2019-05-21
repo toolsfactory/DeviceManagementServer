@@ -7,11 +7,11 @@ using VTV.OpsConsole.RemoteManagement.Interfaces;
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer.StartupTasks
 {
-    public class Initializer : IStartupTask
+    public class CommandsInitializer : IStartupTask
     {
         private readonly ICommandsManagementService _cmdManagementSvc;
 
-        public Initializer(ICommandsManagementService cmdManagementSvc)
+        public CommandsInitializer(ICommandsManagementService cmdManagementSvc)
         {
             _cmdManagementSvc = cmdManagementSvc;
         }

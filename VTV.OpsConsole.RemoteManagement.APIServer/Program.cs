@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using VTV.OpsConsole.RemoteManagement.APIServer.StartupTasks;
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer
 {
@@ -19,19 +20,6 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                /*
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    if (!hostingContext.HostingEnvironment.IsDevelopment())
-                    {
-                        config.AddSecretsManager(configurator: ops =>
-                        {
-                            // Replace __ tokens in the configuration key name
-                            ops.KeyGenerator = (secret, name) => name.Replace("__", ":");
-                        });
-                    }
-                })
-                */
                 .UseStartup<Startup>();
     }
 }

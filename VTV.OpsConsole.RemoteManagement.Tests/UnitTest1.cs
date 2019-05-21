@@ -6,7 +6,7 @@ namespace VTV.OpsConsole.RemoteManagement.Tests
 {
     public class CommandManagementServiceTests
     {
-        private readonly CommandManagementService _service = new CommandManagementService();
+        private readonly CommandManagementService _service = new CommandManagementService(null);
         private readonly string _attributeMissingText = "Required attribute missing '{0}'.";
         private readonly string _attributeWrongTypeText = "Invalid type for attribute '{0}'. '{1}' instead of '{2}'";
 

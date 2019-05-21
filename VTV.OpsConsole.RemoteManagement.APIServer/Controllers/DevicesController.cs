@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using VTV.OpsConsole.RemoteManagement.Models;
 using VTV.OpsConsole.RemoteManagement.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DevicesController : ControllerBase

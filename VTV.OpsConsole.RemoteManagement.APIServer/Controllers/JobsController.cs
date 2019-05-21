@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using VTV.OpsConsole.RemoteManagement.Interfaces;
@@ -6,6 +7,7 @@ using VTV.OpsConsole.RemoteManagement.Models;
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class JobsController : ControllerBase
