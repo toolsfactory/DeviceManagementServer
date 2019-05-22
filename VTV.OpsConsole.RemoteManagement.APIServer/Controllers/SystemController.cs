@@ -1,18 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using VTV.OpsConsole.RemoteManagement.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using VTV.OpsConsole.RemoteManagement.APIServer.Authentication;
+
+
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class StatusController : ControllerBase
+    public class SystemController : ControllerBase
     {
-        private IConfiguration _config;
+        private readonly IConfiguration _config;
         private readonly ICommandsManagementService _cmdManagementSvc;
+        private readonly IUserService _userService;
 
-        public StatusController(IConfiguration config, ICommandsManagementService cmdManagementSvc)
+        public SystemController(IConfiguration config, ICommandsManagementService cmdManagementSvc, IUserService userService)
         {
+            _userService = userService;
             _config = config;
            _cmdManagementSvc = cmdManagementSvc;
         }
@@ -20,7 +27,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         /// Gives an overview of the health and relevant parameters of the mockup service.
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("status")]
         public ActionResult<StatusResult> Get()
         {
             var result = new StatusResult()
@@ -51,17 +58,17 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
                 return Ok();
         }
 
-    }
-    public class StatusResult
-    {
-        public string Environment { get; set; }
-        public string APIAccessKeyInfo { get; set; }
-        public string ServerBaseUrl { get; set; }
-        public string CommandsTemplateSource { get; set; }
-        public string CommandsTemplateAuthor { get; set; }
-        public string CommandsTemplateVersion { get; set; }
-        public bool CommandTemplatesParsed { get; set; }
-        public bool CommandTemplatesLoaded { get; set; }
-        public string CommandTemplatesParseAndLoadError { get; set; }
+        [AllowAnonymous]
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate([FromBody]Models.UserAuthenticateRequestModel model)
+        {
+            var user = _userService.Authenticate(model.Username, model.Password);
+
+            if (user == null)
+                return BadRequest(new { message = "Username or password incorrect" });
+
+            var result = _userService.GenerateToken(user);
+            return Ok(result);
+        }
     }
 }
