@@ -1,6 +1,6 @@
 ﻿namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 {
-    public class StatusResult
+    public class StatusResponse
     {
         public string Environment { get; set; }
         public string APIAccessKeyInfo { get; set; }

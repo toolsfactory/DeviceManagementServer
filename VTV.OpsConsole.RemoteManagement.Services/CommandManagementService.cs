@@ -8,6 +8,10 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Net;
 using Microsoft.Extensions.Configuration;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace VTV.OpsConsole.RemoteManagement.Services
 {
@@ -29,11 +33,13 @@ namespace VTV.OpsConsole.RemoteManagement.Services
         public string CommandTemplateVersion { get; private set; }
 
         public string CommandTemplateAuthor { get; private set; }
+        public IAWSClientsService AwsClients { get; }
 
-        public CommandManagementService(IConfiguration config)
+        public CommandManagementService(IConfiguration config, IAWSClientsService awsClients)
         {
             _AvailableCommands = new List<CommandTemplate>(3);
             _config = config;
+            AwsClients = awsClients;
             LoadCommandTemplates();
         }
 
@@ -89,6 +95,63 @@ namespace VTV.OpsConsole.RemoteManagement.Services
             data.Close();
             reader.Close();
             return s;
+        }
+
+        public async Task<UploadCommandsTemplateResult> UploadCommandsTemplateAsync(JObject template)
+        {
+            var cmdcnt = VerifyNewTemplate(template, out var errortext);
+            if ( cmdcnt <= 0)
+            {
+                return new UploadCommandsTemplateResult { Success = false, ErrorCode = 1, ErrorText = errortext };
+            }
+            return await SaveCommandsTemplateToS3Async(template, cmdcnt);
+        }
+
+        private int VerifyNewTemplate(JObject template, out string errortext)
+        {
+            errortext = "";
+            try
+            {
+                var cmdcount = template["commands"].ToObject<List<CommandTemplate>>().Count;
+                if (cmdcount <= 0)
+                {
+                    errortext = "no commands in template";
+                    return -1;
+                }
+                template["version"] = DateTime.Now.ToString("d");
+                if (String.IsNullOrEmpty(template["author"].ToString()))
+                {
+                    template["author"] = "Unknown";
+                }
+                return cmdcount;
+            }
+            catch (Exception ex)
+            {
+                errortext = "Error parsing JSON. " + ex.Message;
+                return -1;
+            }
+        }
+        
+        private async Task<UploadCommandsTemplateResult> SaveCommandsTemplateToS3Async(JObject template, int cmdcnt)
+        {
+            try
+            {
+                byte[] byteArray = Encoding.ASCII.GetBytes(template.ToString());
+                MemoryStream stream = new MemoryStream(byteArray);
+                var x = new TransferUtility(AwsClients.S3Client);
+                await x.UploadAsync(stream, _config["AWS:S3Bucket"], _config["AWS:S3Filename"]);
+                return new UploadCommandsTemplateResult
+                            {
+                                Success = true,
+                                Author = template["author"].ToString(),
+                                Version = template["version"].ToString(),
+                                CommandsCount = cmdcnt
+                            };
+            }
+            catch (Exception ex)
+            {
+                return new UploadCommandsTemplateResult() { Success = false, ErrorCode = 2, ErrorText = "Commands json could not be uploaded. " + ex.Message };
+            }
         }
 
         public bool CommandExists(string command)

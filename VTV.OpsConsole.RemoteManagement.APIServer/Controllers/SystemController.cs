@@ -3,8 +3,8 @@ using Microsoft.Extensions.Configuration;
 using VTV.OpsConsole.RemoteManagement.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using VTV.OpsConsole.RemoteManagement.APIServer.Authentication;
-
-
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 {
@@ -28,9 +28,9 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("status")]
-        public ActionResult<StatusResult> Get()
+        public ActionResult<StatusResponse> Get()
         {
-            var result = new StatusResult()
+            var result = new StatusResponse()
             {
                 Environment = _config["Environment:Name"],
                 APIAccessKeyInfo = _config["AWS:ApiAccessKey"].Substring(0, 5),
@@ -45,7 +45,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
             return Ok(result);
         }
         /// <summary>
-        /// Reloads command templates so that uploading a new json file and calling this method is enough to modify the available commands.
+        /// Reloads commands template from S3 bucket. Required after an Upload to activate the new configuration.
         /// </summary>
         /// <returns></returns>
         [HttpPost("reload")]
@@ -58,6 +58,26 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
                 return Ok();
         }
 
+        /// <summary>
+        /// Uploads a new commands template into the central bucket
+        /// </summary>
+        /// <param name="template">The template in correct JSON format</param>
+        /// <returns>Details regarding the uploaded template</returns>
+        [HttpPost("upload")]
+        public async Task<ActionResult<Models.UploadCommandsTemplateResponse>> PostUploadAsync([FromBody] JObject template)
+        {
+            var result =await _cmdManagementSvc.UploadCommandsTemplateAsync(template);
+            if (!result.Success)
+                return this.BadRequest(result.ErrorText);
+            else
+                return Ok(new Models.UploadCommandsTemplateResponse { Author = result.Author, Version = result.Version, CommandsCount = result.CommandsCount });
+        }
+
+        /// <summary>
+        /// Use this API to authenticate against the system. In Swagger, copy the returned token from the JSON and insert it in the "Authorize" Dialog as string "Bearer {yourtoken}".
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]Models.UserAuthenticateRequestModel model)

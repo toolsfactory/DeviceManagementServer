@@ -51,11 +51,16 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Authentication
             var parsed = int.TryParse(_config["Usermanagement:TokenExpiresSeconds"], out var expiresSecondsConfig);
 
             var expires = DateTime.UtcNow.AddSeconds((expiresSecondsConfig>0) ? expiresSecondsConfig : expiresSeconds);
+            var claim = new Claim("aaa", "bbb");
+            claim.Properties.Add("cc", "dd");
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim("opco_de", "rm.device.reboot"),
+                    new Claim("opco_de", "rm.device.reboot2"),
+                    claim
                 }),
                 Expires = expires,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

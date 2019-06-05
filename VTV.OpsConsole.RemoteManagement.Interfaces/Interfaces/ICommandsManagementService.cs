@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using VTV.OpsConsole.RemoteManagement.Models;
 
 namespace VTV.OpsConsole.RemoteManagement.Interfaces
@@ -16,5 +18,6 @@ namespace VTV.OpsConsole.RemoteManagement.Interfaces
         bool CommandExists(string command);
         CreateCommandDocumentResponse CreateCommandDocument(CreateCommandDocumentRequest request);
         CommandTemplate GetCommandTemplate(string cmd);
+        Task<UploadCommandsTemplateResult> UploadCommandsTemplateAsync(JObject template);
     }
 }

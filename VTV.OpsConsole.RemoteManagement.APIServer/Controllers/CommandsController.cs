@@ -4,6 +4,8 @@ using VTV.OpsConsole.RemoteManagement.Models;
 using VTV.OpsConsole.RemoteManagement.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Authorization;
+using VTV.OpsConsole.RemoteManagement.APIServer.Authentication;
+using System.Threading.Tasks;
 
 namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
 {
@@ -15,13 +17,14 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         private readonly ICommandSendService _commandSendService;
         private readonly ICommandsManagementService _commandManagementService;
         private readonly IConfiguration _config;
+        private readonly IAuthorizationService _authorizationService;
 
-
-        public CommandsController(ICommandSendService commandSendService, ICommandsManagementService commandManagementService, IConfiguration configuration)
+        public CommandsController(ICommandSendService commandSendService, ICommandsManagementService commandManagementService, IConfiguration configuration, IAuthorizationService authorizationService)
         {
             _commandSendService = commandSendService;
             _commandManagementService = commandManagementService;
             _config = configuration;
+            _authorizationService = authorizationService;
         }
 
         // GET api/commands
@@ -60,8 +63,12 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         /// Boolean = 9
         /// </remarks>
         [HttpGet("{command}")]
-        public ActionResult<CommandTemplate> GetCommandDetails(string command)
+        public async Task<ActionResult<CommandTemplate>> GetCommandDetails(string command)
         {
+            var res = new AuthorizationDetails("de", command);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, res, "OpcoPolicy");
+            if (!authorizationResult.Succeeded)
+                return Forbid();
             if (!_commandManagementService.CommandExists(command))
                 return NotFound();
 
