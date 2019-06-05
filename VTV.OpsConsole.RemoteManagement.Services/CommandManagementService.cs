@@ -138,8 +138,15 @@ namespace VTV.OpsConsole.RemoteManagement.Services
             {
                 byte[] byteArray = Encoding.ASCII.GetBytes(template.ToString());
                 MemoryStream stream = new MemoryStream(byteArray);
+                var req = new TransferUtilityUploadRequest
+                {
+                    InputStream = stream,
+                    BucketName = _config["AWS:S3Bucket"],
+                    Key = _config["AWS:S3Filename"],
+                    CannedACL = S3CannedACL.PublicRead
+                };
                 var x = new TransferUtility(AwsClients.S3Client);
-                await x.UploadAsync(stream, _config["AWS:S3Bucket"], _config["AWS:S3Filename"]);
+                await x.UploadAsync(req);
                 return new UploadCommandsTemplateResult
                             {
                                 Success = true,
