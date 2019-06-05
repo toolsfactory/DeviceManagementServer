@@ -66,9 +66,14 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Controllers
         [HttpPost("upload")]
         public async Task<ActionResult<Models.UploadCommandsTemplateResponse>> PostUploadAsync([FromBody] JObject template)
         {
+            var uid = int.Parse(HttpContext.User.Identity.Name);
+            if (uid > 5)
+            {
+                return Unauthorized("Only user1 to user5 are allowed to upload new templates");
+            }
             var result =await _cmdManagementSvc.UploadCommandsTemplateAsync(template);
             if (!result.Success)
-                return this.BadRequest(result.ErrorText);
+                return BadRequest(result.ErrorText);
             else
                 return Ok(new Models.UploadCommandsTemplateResponse { Author = result.Author, Version = result.Version, CommandsCount = result.CommandsCount });
         }
