@@ -75,7 +75,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Authentication
                                                        SameAuthorRequirement requirement,
                                                        AuthorizationDetails resource)
         {
-            var claim = context.User.Claims.Where(c => c.Type == "opco_" + resource.OpCoID && c.Value == "rm.device." + resource.Command).FirstOrDefault();
+            var claim = context.User.Claims.Where(c => c.Type == "opco_" + resource.OpCoID && c.Value == "rm.device.all").FirstOrDefault();
             if (claim != null)
             {
                 context.Succeed(requirement);

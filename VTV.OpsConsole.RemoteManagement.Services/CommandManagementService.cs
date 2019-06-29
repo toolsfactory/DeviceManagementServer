@@ -199,6 +199,10 @@ namespace VTV.OpsConsole.RemoteManagement.Services
 
         private CreateCommandDocumentResponse CheckForMandatoryParameters(CommandTemplate tpl, CreateCommandDocumentRequest request)
         {
+            if (tpl.Parameters == null)
+            {
+                return new CreateCommandDocumentResponse() { Success = true };
+            }
             if (request.CheckRequired)
             {
                 foreach (var item in tpl.Parameters)
@@ -216,6 +220,10 @@ namespace VTV.OpsConsole.RemoteManagement.Services
 
         private CreateCommandDocumentResponse CheckForCorrectTypes(CommandTemplate tpl, CreateCommandDocumentRequest request)
         {
+            if(tpl.Parameters == null)
+            {
+                return new CreateCommandDocumentResponse() { Success = true };
+            }
             foreach(var item in tpl.Parameters)
             {
                 var value = request.Body[item.Name];
@@ -236,6 +244,10 @@ namespace VTV.OpsConsole.RemoteManagement.Services
 
         private CreateCommandDocumentResponse CheckForCorrectValues(CommandTemplate tpl, CreateCommandDocumentRequest request)
         {
+            if (tpl.Parameters == null)
+            {
+                return new CreateCommandDocumentResponse() { Success = true };
+            }
             foreach (var item in tpl.Parameters)
             {
                 if (String.IsNullOrEmpty(item.AcceptedValues))

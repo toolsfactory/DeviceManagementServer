@@ -58,8 +58,7 @@ namespace VTV.OpsConsole.RemoteManagement.APIServer.Authentication
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim("opco_de", "rm.device.reboot"),
-                    new Claim("opco_de", "rm.device.reboot2"),
+                    new Claim("opco_de", "rm.device.all"),
                     claim
                 }),
                 Expires = expires,
